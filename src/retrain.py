@@ -5,7 +5,8 @@ import numpy as np
 # Get the absolute path of the current script's directory
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# --- Load the existing model ---
+# --- Phase 1: Custom Dataset Extension for Pre-trained Keras Models ---
+# Load the existing model and prepare new data
 model_path = os.path.join(SCRIPT_DIR, "cats_dogs_model.keras")
 model = tf.keras.models.load_model(model_path)
 print("Model loaded from cats_dogs_model.keras ✅")
@@ -48,8 +49,8 @@ dataset = dataset.shuffle(len(file_paths)).batch(32).prefetch(tf.data.AUTOTUNE)
 
 print(f"Dataset prepared with {len(file_paths)} images ✅")
 
-# --- Fine-tuning setup ---
-# Unfreeze the last few layers for fine-tuning
+# --- Phase 2: Refining Vision Models: A Transfer Learning Implementation ---
+# Unfreeze the last few layers and recompile for optimization
 for layer in model.layers[:-2]:  # Freeze all but the last 2 layers
     layer.trainable = False
 
@@ -62,14 +63,15 @@ model.compile(
 
 print("Model ready for fine-tuning ✅")
 
-# --- Fine-tune the model ---
+# --- Phase 3: Incremental Learning: Fine-Tuning Convolutional Networks for Pet Classification ---
+# Execute the training process and save the updated knowledge
 history = model.fit(
     dataset,
     epochs=5  # Fewer epochs for fine-tuning
 )
 
 # --- Save the fine-tuned model ---
-fine_tuned_model_path = os.path.join(SCRIPT_DIR, "cats_dogs_model_fine_tuned.keras")
-model.save(fine_tuned_model_path)
+model.save(os.path.join(SCRIPT_DIR, "cats_dogs_model_fine_tuned.h5"))
+model.save(os.path.join(SCRIPT_DIR, "cats_dogs_model_fine_tuned.keras"))
 
-print(f"Fine-tuned model saved as {fine_tuned_model_path} ✅")
+print("Model saved as .h5 and .keras ✅")
